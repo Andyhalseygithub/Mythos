@@ -51,7 +51,11 @@ public class Enemy : Entity
     {
         if (other.gameObject.GetComponent<testprojectile>())
         {
-            Destroy(gameObject);
+            health -= other.gameObject.GetComponent<testprojectile>().damage;
+            if (health < 0)
+            {
+                Destroy(gameObject);
+            }
         }
     }
     /*

@@ -52,6 +52,7 @@ public class Playercontrol : MonoBehaviour
 
         if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)){
         _rigidbody2D.AddForce(Vector2.left * 15f * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
+
         }
 
         if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)){
@@ -135,13 +136,14 @@ public class Playercontrol : MonoBehaviour
     void OnCollisionStay2D(Collision2D other){
         if(other.gameObject.layer == LayerMask.NameToLayer("Ground")){
             RaycastHit2D[] hits = Physics2D.RaycastAll(transform.position, Vector2.down, 2f);
-            //Debug.DrawRay(transform.position, Vector2.down * 2f);
+            Debug.DrawRay(transform.position, Vector2.down * 2f);
             for(int i = 0; i < hits.Length; i++){
                 RaycastHit2D hit = hits[i];
                 if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground")){
                     jump_counter = 2;
                     flight_time = 2000f;
                     midair = false;
+                    print(hit.normal);
                 }
                 else
                 {

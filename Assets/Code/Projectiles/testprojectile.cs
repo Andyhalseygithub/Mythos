@@ -6,6 +6,7 @@ public class testprojectile : MonoBehaviour
 {
     // Start is called before the first frame update
     Rigidbody2D _rigidbody2D;
+    public float damage = 25;
     void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
