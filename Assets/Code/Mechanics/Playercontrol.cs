@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UIElements;
+using Unity.Mathematics;
 
 public class Playercontrol : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class Playercontrol : MonoBehaviour
     public int health;
     public TMP_Text tspirit;
     public float spirit;
+    // inventory variables 
+    public float weapon_equipped = 1;
     // Initializing jumps and flighttime vars
     public int jump_counter;
     public float flight_time;
@@ -21,6 +24,9 @@ public class Playercontrol : MonoBehaviour
     //get transform and projectile code for player usage
     public Transform aimPivot;
     public GameObject testprojectilePrefab;
+    public GameObject playershogunswordprefab;
+    
+
 
     //bool variable for jumps
     bool midair;
@@ -79,6 +85,8 @@ public class Playercontrol : MonoBehaviour
             if(flight_time > 0){
                 flight_time -= 100f * Time.deltaTime;
                 _rigidbody2D.AddForce(Vector2.up * .06f, ForceMode2D.Impulse);
+                print("hello world");
+                print("e");
 
             }
         }
@@ -93,15 +101,32 @@ public class Playercontrol : MonoBehaviour
 
         aimPivot.rotation = Quaternion.Euler(0, 0, angleToMouse);
 
-        //Attack
-        if(Input.GetMouseButtonDown(0)){
-            GameObject newProjectile = Instantiate(testprojectilePrefab);
-            newProjectile.transform.position = transform.position;
-            newProjectile.transform.rotation = aimPivot.rotation;
+        // Old Attack
+        if (weapon_equipped == 0)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+                GameObject newProjectile = Instantiate(testprojectilePrefab);
+                newProjectile.transform.position = transform.position;
+                newProjectile.transform.rotation = aimPivot.rotation;
+            }
         }
 
+        //New Attack
+        else if (weapon_equipped == 1)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+
+                GameObject newProjectile = Instantiate(playershogunswordprefab);
+                newProjectile.transform.position = transform.position;
+                newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse + 90);
+            }
+        }
+        
+
         //freeze ability 
-        if(Input.GetKey(KeyCode.F) && spirit > 0){
+        if (Input.GetKey(KeyCode.F) && spirit > 0){
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
             //decrement spirit while using ability
             spirit -= 1f * Time.deltaTime;
