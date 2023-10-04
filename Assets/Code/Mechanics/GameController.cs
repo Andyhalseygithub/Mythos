@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
+    public Texture2D crosshair;
     public float maxStarDelay = 2f;
     public float minStarDelay = 0.2f;
     public float starDelay;
@@ -19,6 +20,7 @@ public class GameController : MonoBehaviour
     }
     void Start(){
         StartCoroutine("StarSpawnTimer");
+        Cursor.SetCursor(crosshair, new Vector2(100, 100), CursorMode.Auto);
     }
 
     // Update is called once per frame

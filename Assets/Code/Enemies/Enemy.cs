@@ -14,6 +14,7 @@ public class Enemy : Entity
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         target = GameObject.FindWithTag("Player").transform;
+        damage = 10;
         //target = transform.LookAt(Player);
         //target = FindObjectOfType<Playercontrol>().transform;
         //target = GameObject.Find("Player").transform;
@@ -49,9 +50,20 @@ public class Enemy : Entity
     }
     void OnCollisionEnter2D(Collision2D other) // gets the other object colliding with this object
     {
-        if (other.gameObject.GetComponent<testprojectile>())
+        if (other.gameObject.GetComponent<baseprojectile>())
         {
-            health -= other.gameObject.GetComponent<testprojectile>().damage;
+            health -= other.gameObject.GetComponent<baseprojectile>().damage;
+            if (health < 0)
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+    void OnTriggerEnter2D(Collider2D other) // gets the other object colliding with this object
+    {
+        if (other.gameObject.GetComponent<baseprojectile>())
+        {
+            health -= other.gameObject.GetComponent<baseprojectile>().damage;
             if (health < 0)
             {
                 Destroy(gameObject);

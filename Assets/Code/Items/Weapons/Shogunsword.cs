@@ -2,11 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shogunsword : MonoBehaviour
+public class Shogunsword : Item
 {
     // Start is called before the first frame update
-    public float damage;
-    public float item_id;
     void Start()
     {
         item_id = 1;
