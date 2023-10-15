@@ -43,12 +43,12 @@ public class Shogun : Entity
         if(transform.position.x > target.position.x)
         {
             _spriteRenderer.flipX = true;
-            print("Right");
+            //print("Right");
         }
         else if(transform.position.x < target.position.x)
         {
             _spriteRenderer.flipX = false;
-            print("Left");
+            //print("Left");
         }
         //var DirToPlayer = target.transform.position - this.transform.position;
         //var scaleX = DirToPlayer.x < 0f? -5f : 5f;

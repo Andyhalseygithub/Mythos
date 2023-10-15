@@ -9,10 +9,10 @@ using UnityEngine.SceneManagement;
 using static UnityEngine.GraphicsBuffer;
 using Unity.VisualScripting;
 
-public class Playercontrol : Playerbase
+public class Samurai : Playerbase
 {
     //Initialize playercontrol as an object for enemies to track
-    public static Playercontrol instance;
+    public static Samurai instance;
     // initialize health and spirit vars
     public TMP_Text thealth;
     public float health;
@@ -44,10 +44,10 @@ public class Playercontrol : Playerbase
     public float iframes;
 
     //Speed and acceleration
-    public float speedX = 20f;
-    public float maxSpeedX = 20f;
-    public float speedY = 20f;
-    public float maxSpeedY = 20f;
+    public float speedX = 25f;
+    public float maxSpeedX = 25f;
+    public float speedY = 25f;
+    public float maxSpeedY = 25f;
 
     // Call sprite renderer
     SpriteRenderer _spriteRenderer;
@@ -108,11 +108,11 @@ public class Playercontrol : Playerbase
         //if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)){}
 
         if(Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)){
-        _rigidbody2D.AddForce(Vector2.down * 25f * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.down * speedY * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
         }
 
         if(Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)){
-        _rigidbody2D.AddForce(Vector2.left * 25f * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.left * speedX * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
 
             // sprite direction
             _spriteRenderer.flipX = true;
@@ -120,7 +120,7 @@ public class Playercontrol : Playerbase
         }
 
         if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)){
-        _rigidbody2D.AddForce(Vector2.right * 25f * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.right * speedX * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
             // sprite direction
             _spriteRenderer.flipX = false;
         }

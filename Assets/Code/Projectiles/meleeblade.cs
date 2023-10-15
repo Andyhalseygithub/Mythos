@@ -9,8 +9,8 @@ public class meleeblade : baseprojectile
     void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _rigidbody2D.velocity = transform.right * -30f;
-        damage = 5;
+        _rigidbody2D.velocity = transform.right * -33f;
+        damage = 6;
     }
 
     // Update is called once per frame
