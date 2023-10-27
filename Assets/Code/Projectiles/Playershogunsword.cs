@@ -24,4 +24,8 @@ public class Playershogunsword : baseprojectile
     {
         _rigidbody2D.velocity += _rigidbody2D.velocity * 2f * Time.deltaTime;
     }
+    void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
 }

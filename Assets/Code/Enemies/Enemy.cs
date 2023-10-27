@@ -13,7 +13,7 @@ public class Enemy : Entity
     void Start()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        target = GameObject.FindWithTag("Player").transform;
+        //target = GameObject.FindWithTag("Player").transform;
         damage = 10;
         //target = transform.LookAt(Player);
         //target = FindObjectOfType<Playercontrol>().transform;
@@ -23,6 +23,7 @@ public class Enemy : Entity
     // Update is called once per frame
     void Update()
     {
+        target = GameObject.FindWithTag("Player").transform;
         /*
         float acceleration = 1f;
         float maxSpeed = 2f;
@@ -35,8 +36,8 @@ public class Enemy : Entity
         _rigidbody2D.AddForce(transform.right * acceleration);
         _rigidbody2D.velocity = Vector2.ClampMagnitude(_rigidbody2D.velocity, maxSpeed);
         */
-        
-        if(target){
+
+        if (target){
             Vector3 direction = (target.position - transform.position).normalized;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             _rigidbody2D.rotation = angle;
@@ -48,22 +49,24 @@ public class Enemy : Entity
         
         
     }
-    void OnCollisionEnter2D(Collision2D other) // gets the other object colliding with this object
+    void OnCollisionStay2D(Collision2D other) // gets the other object colliding with this object
     {
-        if (other.gameObject.GetComponent<baseprojectile>())
+        if (other.gameObject.GetComponent<baseprojectile>())// && iframes <= 0)
         {
             health -= other.gameObject.GetComponent<baseprojectile>().damage;
+            //iframes = 1000f;
             if (health < 0)
             {
                 Destroy(gameObject);
             }
         }
     }
-    void OnTriggerEnter2D(Collider2D other) // gets the other object colliding with this object
+    void OnTriggerStay2D(Collider2D other) // gets the other object colliding with this object
     {
-        if (other.gameObject.GetComponent<baseprojectile>())
+        if (other.gameObject.GetComponent<baseprojectile>())// && iframes <= 0)
         {
             health -= other.gameObject.GetComponent<baseprojectile>().damage;
+            //iframes = 1000f;
             if (health < 0)
             {
                 Destroy(gameObject);

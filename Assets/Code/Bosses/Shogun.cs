@@ -18,7 +18,6 @@ public class Shogun : Entity
         animator = GetComponent<Animator>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
-        target = GameObject.FindWithTag("Player").transform;
         damage = 70;
         health = 5000;
     }
@@ -30,6 +29,7 @@ public class Shogun : Entity
     // Update is called once per frame
     void Update()
     {
+        target = GameObject.FindWithTag("Player").transform;
         if (target)
         {
             Vector3 direction = (target.position + new Vector3(0, 5, 0) - transform.position).normalized;

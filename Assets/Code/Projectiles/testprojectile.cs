@@ -23,4 +23,8 @@ public class testprojectile : baseprojectile
     {
         
     }
+    void OnBecameInvisible() 
+    {
+        Destroy(gameObject); 
+    }
 }

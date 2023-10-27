@@ -15,7 +15,7 @@ public class SwordAltar : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D other) // gets the other object colliding with this object
     {
-        if (other.gameObject.GetComponent<Playercontrol>()) {
+        if (other.gameObject.GetComponent<Playerbase>()) {
             if (SpawnedBoss == false) {
                 GameObject spawnboss = Instantiate(Shogun);
                 spawnboss.transform.position = transform.position + new Vector3(5f, 20f, 0);

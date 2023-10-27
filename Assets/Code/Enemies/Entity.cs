@@ -8,7 +8,7 @@ public class Entity : MonoBehaviour
     public float health;
     public float speed;
     public float damage;
-
+    //public float iframes;
     void Start()
     {
         
@@ -17,6 +17,13 @@ public class Entity : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+   /*     if (iframes > 0)
+        {
+            iframes -= 1000f * Time.deltaTime;
+        }
+        if (iframes < 0)
+        {
+            iframes = 0;
+        }*/
     }
 }

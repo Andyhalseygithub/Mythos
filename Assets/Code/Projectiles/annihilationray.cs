@@ -27,4 +27,8 @@ public class annihilationray : baseprojectile
     {
         _rigidbody2D.velocity += _rigidbody2D.velocity * 1.1f * Time.deltaTime;
     }
+    void OnBecameInvisible()
+    {
+        Destroy(gameObject);
+    }
 }
