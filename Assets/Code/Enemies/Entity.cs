@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class Entity : MonoBehaviour
@@ -8,10 +9,12 @@ public class Entity : MonoBehaviour
     public float health;
     public float speed;
     public float damage;
+    public bool ranDeathFunction;
+    
     //public float iframes;
     void Start()
     {
-        
+        ranDeathFunction = false;
     }
 
     // Update is called once per frame
@@ -25,5 +28,14 @@ public class Entity : MonoBehaviour
         {
             iframes = 0;
         }*/
+    }
+    public void death(int spiritsGained)
+    {
+        if (ranDeathFunction == false)
+        {
+            GameController.instance.GetSpirits(spiritsGained);
+            Destroy(gameObject);
+            ranDeathFunction = true;
+        }
     }
 }

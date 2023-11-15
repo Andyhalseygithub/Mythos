@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class GameController : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class GameController : MonoBehaviour
     public float maxStarDelay = 2f;
     public float minStarDelay = 0.2f;
     public float starDelay;
+    public TMP_Text spiritstext;
+    public int spirits;
 
     public Transform[] spawnPoints;
     public GameObject[] starPrefabs;
@@ -30,6 +33,7 @@ public class GameController : MonoBehaviour
         Cursor.SetCursor(crosshair, new UnityEngine.Vector2(100, 100), CursorMode.Auto);
         activeChar = false;
         Samurai.SetActive(!gameObject.activeInHierarchy);
+        spirits = 0;
     }
 
     // Update is called once per frame
@@ -38,7 +42,7 @@ public class GameController : MonoBehaviour
         timeElapsed += Time.deltaTime;
         float decreaseDelayOverTime = maxStarDelay - ((maxStarDelay - minStarDelay) / 30f * timeElapsed);
         starDelay = Mathf.Clamp(decreaseDelayOverTime, minStarDelay, maxStarDelay);
-
+        UpdateDisplay();
 
         //Swapping characters
 
@@ -109,5 +113,14 @@ public class GameController : MonoBehaviour
         yield return new WaitForSeconds(starDelay);
         SpawnStar();
         StartCoroutine("StarSpawnTimer");
+    }
+
+    public void GetSpirits(int spiritsAdded)
+    {
+        spirits += spiritsAdded;
+    }
+    void UpdateDisplay()
+    {
+        spiritstext.text = "Spirit Essence: " + spirits;
     }
 }

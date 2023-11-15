@@ -73,7 +73,7 @@ public class Wisps : Entity
             health -= other.gameObject.GetComponent<baseprojectile>().damage;
             if (health < 0)
             {
-                Destroy(gameObject);
+                death(100);
             }
         }
     }
@@ -84,7 +84,7 @@ public class Wisps : Entity
             health -= other.gameObject.GetComponent<baseprojectile>().damage;
             if (health < 0)
             {
-                Destroy(gameObject);
+                death(100);
             }
         }
     }

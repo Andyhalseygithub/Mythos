@@ -39,6 +39,7 @@ public class Samurai : Playerbase
     public GameObject meleeblade;
     public GameObject annihilationray;
     public GameObject Spiritslasher;
+    public GameObject TendrilPrefab;
     // Rotation timer
     public float i = 100;
 
@@ -51,13 +52,16 @@ public class Samurai : Playerbase
     public float iframes;
 
     //Speed and acceleration
-    public float speedX = 80f;
+    public float speedX = 60f;
     public float maxSpeedX = 25f;
-    public float speedY = 80f;
+    public float speedY = 70f;
     public float maxSpeedY = 25f;
 
     // Call sprite renderer
     SpriteRenderer[] _spriteRenderer;
+
+    //menus
+    public bool paused;
     void Awake(){
         instance = this;
     }
@@ -77,6 +81,14 @@ public class Samurai : Playerbase
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            MenuController.instance.Show();
+        }
+        if (paused)
+        {
+            return; 
+        }
         //health
         //thealth.text = health.ToString();
 
@@ -117,7 +129,7 @@ public class Samurai : Playerbase
 
         //if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)){}
 
-        if(Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)){
+        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)){
         _rigidbody2D.AddForce(Vector2.down * speedY * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
         }
 
@@ -125,6 +137,7 @@ public class Samurai : Playerbase
         _rigidbody2D.AddForce(Vector2.left * speedX * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
 
             // sprite direction
+            transform.localScale = new Vector3(-2,2,2);
             //_spriteRenderer.flipX = true;
 
         }
@@ -132,6 +145,7 @@ public class Samurai : Playerbase
         if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)){
         _rigidbody2D.AddForce(Vector2.right * speedX * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
             // sprite direction
+            transform.localScale = new Vector3(2, 2, 2);
             //_spriteRenderer.flipX = false;
         }
 
@@ -249,38 +263,44 @@ public class Samurai : Playerbase
 
         //freeze ability 
         if (Input.GetKey(KeyCode.F) && spirit > 0){
-            _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+            //_rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
             //decrement spirit while using ability
             spirit -= 500f * Time.deltaTime;
+            Time.timeScale = 0.5f;
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
             freezeflag = true;
         }
         else if(Input.GetKey(KeyCode.F) && spirit <= 0)
         {
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
             freezeflag = false;
         }
         else
         {
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
             freezeflag = false;
         }
 
         // Spirit dash ability
         if(Input.GetKey(KeyCode.RightArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000){
-        _rigidbody2D.AddForce(Vector2.right * 80f, ForceMode2D.Impulse);  // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.right * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
         }
         if(Input.GetKey(KeyCode.LeftArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000)
         {
-        _rigidbody2D.AddForce(Vector2.left * 80f, ForceMode2D.Impulse);  // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.left * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
         }
         if(Input.GetKey(KeyCode.UpArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000){
-        _rigidbody2D.AddForce(Vector2.up * 60f, ForceMode2D.Impulse);  // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.up * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
         }
         if(Input.GetKey(KeyCode.DownArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000){
-        _rigidbody2D.AddForce(Vector2.down * 60f, ForceMode2D.Impulse);  // vector(x,y,z)
+        _rigidbody2D.AddForce(Vector2.down * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
         }
 
@@ -358,7 +378,59 @@ public class Samurai : Playerbase
             }
         }
     }
+    private void FixedUpdate() // framerate locking rapid fire weapons
+    {
+        /*if (Input.GetKey(KeyCode.Alpha3))
+        {
+            weapon_equipped = 2;
+        }
+        if (weapon_equipped == 2 && Input.GetMouseButton(0))
+        {
 
+            GameObject newProjectile = Instantiate(meleeblade);
+            newProjectile.transform.position = transform.position;
+            i += 5; // Rotation in degrees increment
+            if (i > 220)
+            {
+                i = 100;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
+            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - 180);
+        }
+        else if (Input.GetKey(KeyCode.Alpha4))
+        {
+            weapon_equipped = 3;
+        }
+        if (weapon_equipped == 3 && Input.GetMouseButton(0))
+        {
+
+            GameObject newProjectile = Instantiate(annihilationray);
+            newProjectile.transform.position = transform.position;
+            //newProjectile.transform.rotation = aimPivot.rotation;
+            i += 5; // Rotation in degrees increment
+            if (i > 200)
+            {
+                i = 180;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
+        }*/
+        if (Input.GetKey(KeyCode.Alpha6))
+        {
+            weapon_equipped = 5;
+        }
+        if (weapon_equipped == 5 && Input.GetMouseButton(0))
+        {
+            GameObject newProjectile = Instantiate(TendrilPrefab);
+            newProjectile.transform.position = transform.position;
+            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
+            /*i += 25; // Rotation in degrees increment
+            if (i > 225)
+            {
+                i = 175;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
+        }
+    }
     public void Transformation()
     {
         //GameController.instance.TransformationS();
@@ -380,7 +452,7 @@ public class Samurai : Playerbase
                 RaycastHit2D hit = hits[i];
                 if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground")){
                     jump_counter = 1;
-                    flight_time = 2000f;
+                    flight_time = 200f;
                 }
             }
         }

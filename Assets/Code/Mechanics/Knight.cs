@@ -39,6 +39,9 @@ public class Knight : Playerbase
     public GameObject meleeblade;
     public GameObject annihilationray;
     public GameObject Spiritslasher;
+    public GameObject Lightningprefab;
+    public GameObject Cataclysmprefab;
+    public GameObject Penumbraprefab;
     // Rotation timer
     public float i = 100;
 
@@ -58,6 +61,12 @@ public class Knight : Playerbase
 
     // Call sprite renderer
     SpriteRenderer[] _spriteRenderer;
+
+    //public mouse position needed for some weapons in fixed update
+    public float angleToMouse;
+
+    //menus
+    public bool paused;
     void Awake(){
         instance = this;
     }
@@ -68,8 +77,8 @@ public class Knight : Playerbase
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponentsInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
-        health = 200;
-        maxHealth = 200;
+        health = 20000;
+        maxHealth = 20000;
         spirit = 1000;
         spiritMax = 1000;
     }
@@ -77,6 +86,14 @@ public class Knight : Playerbase
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            MenuController.instance.Show();
+        }
+        if (paused)
+        {
+            return;
+        }
         //health
         //thealth.text = health.ToString();
 
@@ -127,6 +144,7 @@ public class Knight : Playerbase
             _rigidbody2D.AddForce(Vector2.left * speedX * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
 
             // sprite direction
+            transform.localScale = new Vector3(-2, 2, 2);
             //_spriteRenderer.flipX = true;
 
         }
@@ -135,6 +153,7 @@ public class Knight : Playerbase
         {
             _rigidbody2D.AddForce(Vector2.right * speedX * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
             // sprite direction
+            transform.localScale = new Vector3(2, 2, 2);
             //_spriteRenderer.flipX = false;
         }
 
@@ -201,7 +220,6 @@ public class Knight : Playerbase
             newProjectile.transform.position = transform.position;
             newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse + 90);
         }
-
         else if (Input.GetKey(KeyCode.Alpha3))
         {
             weapon_equipped = 2;
@@ -219,7 +237,6 @@ public class Knight : Playerbase
             newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
             //newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - 180);
         }
-
         else if (Input.GetKey(KeyCode.Alpha4))
         {
             weapon_equipped = 3;
@@ -255,21 +272,28 @@ public class Knight : Playerbase
 
 
         //freeze ability 
+        //freeze ability 
         if (Input.GetKey(KeyCode.F) && spirit > 0)
         {
-            _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+            //_rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
             //decrement spirit while using ability
             spirit -= 500f * Time.deltaTime;
+            Time.timeScale = 0.5f;
+            Time.fixedDeltaTime = 0.02f * Time.timeScale;
             freezeflag = true;
         }
         else if (Input.GetKey(KeyCode.F) && spirit <= 0)
         {
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
             freezeflag = false;
         }
         else
         {
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
+            Time.timeScale = 1f;
+            Time.fixedDeltaTime = 0.02f;
             freezeflag = false;
         }
 
@@ -375,6 +399,92 @@ public class Knight : Playerbase
             }
         }
     }
+
+    private void FixedUpdate() // framerate locking rapid fire weapons
+    {
+        /*if (Input.GetKey(KeyCode.Alpha3))
+        {
+            weapon_equipped = 2;
+        }
+        if (weapon_equipped == 2 && Input.GetMouseButton(0))
+        {
+
+            GameObject newProjectile = Instantiate(meleeblade);
+            newProjectile.transform.position = transform.position;
+            i += 5; // Rotation in degrees increment
+            if (i > 220)
+            {
+                i = 100;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
+            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - 180);
+        }
+        else if (Input.GetKey(KeyCode.Alpha4))
+        {
+            weapon_equipped = 3;
+        }
+        if (weapon_equipped == 3 && Input.GetMouseButton(0))
+        {
+
+            GameObject newProjectile = Instantiate(annihilationray);
+            newProjectile.transform.position = transform.position;
+            //newProjectile.transform.rotation = aimPivot.rotation;
+            i += 5; // Rotation in degrees increment
+            if (i > 200)
+            {
+                i = 180;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
+        }*/
+        if (Input.GetKey(KeyCode.Alpha6))
+        {
+            weapon_equipped = 5;
+        }
+        if (weapon_equipped == 5 && Input.GetMouseButton(0))
+        {
+            GameObject newProjectile = Instantiate(Lightningprefab);
+            newProjectile.transform.position = transform.position;
+            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
+            /*i += 25; // Rotation in degrees increment
+            if (i > 225)
+            {
+                i = 175;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
+        }
+        if (Input.GetKey(KeyCode.Alpha7))
+        {
+            weapon_equipped = 6;
+        }
+        if (weapon_equipped == 6 && Input.GetMouseButton(0))
+        {
+            GameObject newProjectile = Instantiate(Cataclysmprefab);
+            newProjectile.transform.position = transform.position;
+            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
+            /*i += 25; // Rotation in degrees increment
+            if (i > 225)
+            {
+                i = 175;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
+        }
+        if (Input.GetKey(KeyCode.Alpha8))
+        {
+            weapon_equipped = 7;
+        }
+        if (weapon_equipped == 7 && Input.GetMouseButton(0))
+        {
+            GameObject newProjectile = Instantiate(Penumbraprefab);
+            newProjectile.transform.position = transform.position;
+            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
+            /*i += 25; // Rotation in degrees increment
+            if (i > 225)
+            {
+                i = 175;
+            }
+            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
+        }
+    }
     public void Transformation()
     {
         //GameController.instance.TransformationS();
@@ -392,7 +502,7 @@ public class Knight : Playerbase
                 RaycastHit2D hit = hits[i];
                 if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground")){
                     jump_counter = 1;
-                    flight_time = 2000f;
+                    flight_time = 200f;
                 }
             }
         }

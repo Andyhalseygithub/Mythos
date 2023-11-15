@@ -57,7 +57,7 @@ public class Enemy : Entity
             //iframes = 1000f;
             if (health < 0)
             {
-                Destroy(gameObject);
+                death(10);
             }
         }
     }
@@ -69,7 +69,7 @@ public class Enemy : Entity
             //iframes = 1000f;
             if (health < 0)
             {
-                Destroy(gameObject);
+                death(10);
             }
         }
     }
