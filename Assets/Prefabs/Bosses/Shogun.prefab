@@ -20,7 +20,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &5494723132429057581
 Transform:
   m_ObjectHideFlags: 0
@@ -126,8 +126,29 @@ MonoBehaviour:
   damage: 0
   ranDeathFunction: 0
   shoottimer: 0
+  shootcounter: 0
   randomdirection: 0
   Shogunslash: {fileID: 2762280646399303336, guid: fe8ee0bd4ab5a224c87b18467c78a0b4, type: 3}
+  spiritblast: {fileID: 4110838045810538003, guid: 14b9352736c661841b0f7819e5e8cb00, type: 3}
+  trace: {fileID: 575758275799921924, guid: 0002fe5e9dbe75741a02829a2ef5057c, type: 3}
+  upsword: {fileID: 4051236531032142285, guid: 1c2c4dea12b486746bd74c965cda6136, type: 3}
+  downsword: {fileID: 7277563544649126554, guid: 0a8590bb3e129d841bfc95e1641172fd, type: 3}
+  counter: 0
+  move: 0
+  move2: 0
+  move3: 0
+  randomdist: 0
+  randomAngle: 0
+  randomAngle2: 0
+  randomAngle3: 0
+  BossHealthBar: {fileID: 0}
+  BossHealthBarBack: {fileID: 0}
+  maxHealth: 0
+  start: 0
+  bottomofscreen: 0
+  despcounter: 0
+  prerain: 0
+  rain: 0
 --- !u!50 &700024317606819525
 Rigidbody2D:
   serializedVersion: 4

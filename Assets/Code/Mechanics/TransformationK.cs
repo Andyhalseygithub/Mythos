@@ -7,6 +7,5 @@ public class TransformationK : MonoBehaviour
     public void TransformFinish()
     {
         GameController.instance.TransformationS();
-        
     }
 }

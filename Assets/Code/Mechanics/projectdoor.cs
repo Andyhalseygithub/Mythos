@@ -7,7 +7,7 @@ public class projectdoor : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        MusicController.instance.playtowertheme();
     }
 
     // Update is called once per frame
@@ -19,7 +19,9 @@ public class projectdoor : MonoBehaviour
     {
         if (other.gameObject.GetComponent<Playerbase>())
         {
-            SceneManager.LoadScene("project2arena");
+            Samurai.instance.heal();
+            Knight.instance.heal();
+            SceneManager.LoadScene("Forest");
         }
     }
 }

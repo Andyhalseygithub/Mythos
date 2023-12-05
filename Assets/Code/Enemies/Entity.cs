@@ -38,4 +38,13 @@ public class Entity : MonoBehaviour
             ranDeathFunction = true;
         }
     }
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        //iframes = 1000f;
+        if (health < 0)
+        {
+            death(10);
+        }
+    }
 }

@@ -10,6 +10,7 @@ public class Wisps : Entity
     Transform target;
     SpriteRenderer _spriteRenderer;
     Vector2 moveDirection;
+    public float despawnTimer = 300000;
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -19,7 +20,7 @@ public class Wisps : Entity
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
         //target = GameObject.FindWithTag("Player").transform;
-        damage = 15;
+        damage = 30;
         speed = 7.5f;
         health = 200;
         //target = transform.LookAt(Player);
@@ -28,8 +29,26 @@ public class Wisps : Entity
     }
 
     // Update is called once per frame
+    private void FixedUpdate()
+    {
+        despawnTimer -= 10000f * Time.deltaTime;
+        if (despawnTimer <= 0)
+        {
+            death(0);
+        }
+    }
     void Update()
     {
+        if (health < 0)
+        {
+            death(200);
+        }
+        int soundchance = Random.Range(1, 500);
+
+        if (soundchance == 150) {
+            Audiocontroller.instance.playspirit();
+        }
+
         target = GameObject.FindWithTag("Player").transform;
         /*
         float acceleration = 1f;
@@ -48,7 +67,7 @@ public class Wisps : Entity
         {
             Vector3 direction = (target.position - transform.position).normalized;
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-            _rigidbody2D.rotation = angle;
+            //_rigidbody2D.rotation = angle;
             moveDirection = direction;
 
             _rigidbody2D.velocity = new Vector2(moveDirection.x, moveDirection.y) * speed;
@@ -73,7 +92,8 @@ public class Wisps : Entity
             health -= other.gameObject.GetComponent<baseprojectile>().damage;
             if (health < 0)
             {
-                death(100);
+                death(200);
+                Audiocontroller.instance.playspirit();
             }
         }
     }
@@ -84,7 +104,8 @@ public class Wisps : Entity
             health -= other.gameObject.GetComponent<baseprojectile>().damage;
             if (health < 0)
             {
-                death(100);
+                death(200);
+                Audiocontroller.instance.playspirit();
             }
         }
     }

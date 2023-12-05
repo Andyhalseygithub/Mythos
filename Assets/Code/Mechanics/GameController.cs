@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,9 @@ public class GameController : MonoBehaviour
     public float minStarDelay = 0.2f;
     public float starDelay;
     public TMP_Text spiritstext;
-    public int spirits;
+    public static int spirits;
+    //public static bool unlockedHellbourne;
+    //public static bool unlockedShadebringer;
 
     public Transform[] spawnPoints;
     public GameObject[] starPrefabs;
@@ -22,6 +25,7 @@ public class GameController : MonoBehaviour
     //swap
     public GameObject Activeplayer, Samurai, Knight;
     public bool activeChar;
+    public bool currentcam;
 
     void Awake()
     {
@@ -31,9 +35,9 @@ public class GameController : MonoBehaviour
     {
         StartCoroutine("StarSpawnTimer");
         Cursor.SetCursor(crosshair, new UnityEngine.Vector2(100, 100), CursorMode.Auto);
-        activeChar = false;
+        activeChar = true;
+        currentcam = true; //true for knight, false for samurai
         Samurai.SetActive(!gameObject.activeInHierarchy);
-        spirits = 0;
     }
 
     // Update is called once per frame
@@ -69,21 +73,48 @@ public class GameController : MonoBehaviour
         */
         //Player.SetActive(!gameObject.activeInHierarchy)
     }
-
+ 
     public void TransformationS()
     {
-        Samurai.SetActive(gameObject.activeInHierarchy);
-        Knight.SetActive(!gameObject.activeInHierarchy);
-        Samurai.transform.position = Knight.transform.position;
-        activeChar = true;
+        if (activeChar)
+        {
+            Samurai.SetActive(gameObject.activeInHierarchy);
+            Knight.SetActive(!gameObject.activeInHierarchy);
+            Samurai.transform.position = Knight.transform.position;
+            activeChar = false;
+            StartCoroutine(waiting());
+            StartCoroutine(cameraswapS());
+        }
     }
     public void TransformationK()
     {
-        Knight.SetActive(gameObject.activeInHierarchy);
-        Samurai.SetActive(!gameObject.activeInHierarchy);
-        Knight.transform.position = Samurai.transform.position;
-        activeChar = false;
+        if (activeChar)
+        {
+            Knight.SetActive(gameObject.activeInHierarchy);
+            Samurai.SetActive(!gameObject.activeInHierarchy);
+            Knight.transform.position = Samurai.transform.position;
+            activeChar = false;
+            StartCoroutine(waiting());
+            StartCoroutine(cameraswapK());
+        }
     }
+
+    IEnumerator waiting()
+    {
+        yield return new WaitForSeconds(10);
+        yield return activeChar = true;
+    }
+    IEnumerator cameraswapS()
+    {
+        yield return new WaitForSeconds(0.01f);
+        yield return currentcam = false;
+    }
+    IEnumerator cameraswapK()
+    {
+        yield return new WaitForSeconds(0.01f);
+        yield return currentcam = true;
+    }
+
     void SpawnStar()
     {
         int randomSpawnIndex = Random.Range(0, spawnPoints.Length);
@@ -100,8 +131,6 @@ public class GameController : MonoBehaviour
             {
                 spawnenemy = false;
             }
-
-
         }
         if (spawnenemy)
         {
@@ -121,6 +150,6 @@ public class GameController : MonoBehaviour
     }
     void UpdateDisplay()
     {
-        spiritstext.text = "Spirit Essence: " + spirits;
+        spiritstext.text = "Spirit Essence: \n" + spirits;
     }
 }

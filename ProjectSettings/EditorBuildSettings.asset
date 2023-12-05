@@ -11,10 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Pagoda.unity
     guid: 089faeb4bff6ee44d9d1ecff91ef7ffc
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Project2.unity
     guid: 27eb52bc18fff3b45a8ce13b7adf296f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/project2arena.unity
     guid: d463ccd9431bd39439e50a2a65e6da47
+  - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: daaf9b57a8006f04f81c948aad0581a9
   m_configObjects: {}

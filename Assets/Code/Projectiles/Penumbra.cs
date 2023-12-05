@@ -13,23 +13,23 @@ public class Penumbra : baseprojectile
         _rigidbody2D = GetComponent<Rigidbody2D>();
         randomSpeed = Random.Range(35f, 70f);
         //randomAngle = Random.Range(-0.1f, .1f);
-        StartCoroutine(ChangeAngle());
-        damage = 80;
-        Vector3 mousePosition = Input.mousePosition;
+        //StartCoroutine(ChangeAngle());
+        //damage = 80;
+        /*Vector3 mousePosition = Input.mousePosition;
         Vector3 mousePositionInWorld = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3 directionFromPlayerToMouse = mousePositionInWorld - transform.position;
 
         float radiansToMouse = Mathf.Atan2(directionFromPlayerToMouse.y, directionFromPlayerToMouse.x);
-        angleToMouse = radiansToMouse * Mathf.Rad2Deg;
+        angleToMouse = radiansToMouse * Mathf.Rad2Deg;*/
     }
     //                                 |
     //  AWESOME MAGIC/LIGHTNING EFFECT \/
     void FixedUpdate()
     {
         //randomAngle = Random.Range(-100f, 100f);
-        float angle = randomAngle * Mathf.Rad2Deg;
-        _rigidbody2D.transform.rotation = Quaternion.Euler(0, 0, (angleToMouse - randomAngle));
-        _rigidbody2D.velocity = transform.right * randomSpeed;
+        //float angle = randomAngle * Mathf.Rad2Deg;
+        //_rigidbody2D.transform.rotation = Quaternion.Euler(0, 0, (angleToMouse - randomAngle));
+        _rigidbody2D.velocity = transform.right * 150f; //randomSpeed;
     }
 
     void OnBecameInvisible()

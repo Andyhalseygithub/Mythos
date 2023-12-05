@@ -73,6 +73,8 @@ public class Enemy : Entity
             }
         }
     }
+
+
     /*
     void fixedupdate(){
         if(target){

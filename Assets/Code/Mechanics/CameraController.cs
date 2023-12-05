@@ -37,11 +37,11 @@ public class CameraController : MonoBehaviour
     void Update()
     {
         
-        if (activecam == false)
+        if (GameController.instance.currentcam == true)
         {
             track(target, offset);
         }
-        else if (activecam == true)
+        else if (GameController.instance.currentcam == false)
         {
 
             track(target2, offset);

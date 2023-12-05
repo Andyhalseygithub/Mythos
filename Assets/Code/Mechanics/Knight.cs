@@ -12,17 +12,18 @@ using UnityEngine.UI;
 
 public class Knight : Playerbase
 {
+    #region variables
     //animation
     Animator animator;
     //Initialize playercontrol as an object for enemies to track
     public static Knight instance;
     // initialize health and spirit vars
     public TMP_Text thealth;
-    public float health;
-    public float maxHealth;
+    public static float health;
+    public static float maxHealth;
     public TMP_Text tspirit;
     public float spirit;
-    public float spiritMax;
+    public static float spiritMax;
     public UnityEngine.UI.Image Spiritbar;
     public bool freezeflag;
     // inventory variables 
@@ -30,6 +31,8 @@ public class Knight : Playerbase
     // Initializing jumps and flighttime vars
     public int jump_counter;
     public float flight_time;
+    public static float flight_new;
+    public bool flightcheck;
     // Initialize rigidbody for usage in code
     Rigidbody2D _rigidbody2D;
     //get transform and projectile code for player usage
@@ -42,6 +45,7 @@ public class Knight : Playerbase
     public GameObject Lightningprefab;
     public GameObject Cataclysmprefab;
     public GameObject Penumbraprefab;
+    public GameObject flames;
     // Rotation timer
     public float i = 100;
 
@@ -67,6 +71,25 @@ public class Knight : Playerbase
 
     //menus
     public bool paused;
+
+    //upgrade texts
+    public TMP_Text healthupgrade;
+    public TMP_Text wingupgrade;
+    public TMP_Text spiritupgrade;
+    public static bool unlockedHellbourne;
+    public static bool unlockedShadebringer;
+
+    //dash 
+    public bool canDash;
+
+    //aim
+    public bool FacingLeft;
+
+    //consume
+    public bool canConsume;
+
+    #endregion variables
+
     void Awake(){
         instance = this;
     }
@@ -77,10 +100,15 @@ public class Knight : Playerbase
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponentsInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
-        health = 20000;
-        maxHealth = 20000;
+        health = 600;
+        maxHealth = 600;
         spirit = 1000;
         spiritMax = 1000;
+        canDash = true;
+        canConsume = true;
+        flightcheck = true;
+        unlockedHellbourne = false;
+        unlockedShadebringer = false;
     }
 
     // Update is called once per frame
@@ -94,47 +122,18 @@ public class Knight : Playerbase
         {
             return;
         }
-        //health
-        //thealth.text = health.ToString();
 
-        /*
-        // Set mass to 0.5 or lower for this, modify linear drag
-        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+        #region movement
+
+        float movementSpeed = _rigidbody2D.velocity.magnitude;
+        animator.SetFloat("speed", movementSpeed);
+        if (movementSpeed > 0.1f)
         {
-            _rigidbody2D.AddForce(Vector2.down * 25f * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
-            if (_rigidbody2D.velocity.magnitude > maxSpeedY)
-            {
-                _rigidbody2D.velocity = _rigidbody2D.velocity.normalized * maxSpeedY;
-            }
+            animator.SetFloat("movementX", _rigidbody2D.velocity.x);
+            animator.SetFloat("movementY", _rigidbody2D.velocity.y);
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
-        {
-            _rigidbody2D.AddForce(Vector2.left * 15f * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
-            // sprite direction
-            if (_rigidbody2D.velocity.magnitude > maxSpeedX)
-            {
-                _rigidbody2D.velocity = _rigidbody2D.velocity.normalized * maxSpeedX;
-            }
-            // sprite direction
-            _spriteRenderer.flipX = true;
-
-        }
-
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
-        {
-            _rigidbody2D.AddForce(Vector2.right * 15f * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
-            // sprite direction
-            if (_rigidbody2D.velocity.magnitude > maxSpeedX)
-            {
-                _rigidbody2D.velocity = _rigidbody2D.velocity.normalized * maxSpeedX;
-            }
-            _spriteRenderer.flipX = false;
-        }*/
-
-        //if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)){}
-
-        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
+            if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
         {
             _rigidbody2D.AddForce(Vector2.down * speedY * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
         }
@@ -145,6 +144,7 @@ public class Knight : Playerbase
 
             // sprite direction
             transform.localScale = new Vector3(-2, 2, 2);
+            FacingLeft = true;
             //_spriteRenderer.flipX = true;
 
         }
@@ -154,6 +154,7 @@ public class Knight : Playerbase
             _rigidbody2D.AddForce(Vector2.right * speedX * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
             // sprite direction
             transform.localScale = new Vector3(2, 2, 2);
+            FacingLeft = false;
             //_spriteRenderer.flipX = false;
         }
 
@@ -164,39 +165,85 @@ public class Knight : Playerbase
             _rigidbody2D.AddForce(Vector2.up * 35f, ForceMode2D.Impulse); // vector(x,y,z)
         }
 
-        // Flight
-        /*
-        if(Input.GetKey(KeyCode.Space) && jump_counter == 0){
-            if(flight_time > 0){
-                flight_time--;
-                _rigidbody2D.AddForce(Vector2.up * .04f, ForceMode2D.Impulse);
-
-            }
-        }
-        */
-        //Application.targetFrameRate = 60; // Affects the rate of flight
         if (Input.GetKey(KeyCode.Space) && jump_counter == 0)
         {
             if (flight_time > 0)
             {
                 flight_time -= 100f * Time.deltaTime;
                 _rigidbody2D.AddForce(Vector2.up * 120f * Time.deltaTime, ForceMode2D.Impulse);
-
+                if (flightcheck)
+                {
+                    StartCoroutine(flight());
+                }
             }
         }
+        #endregion movement
 
+#region attacks
         // Aim
         Vector3 mousePosition = Input.mousePosition;
         Vector3 mousePositionInWorld = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3 directionFromPlayerToMouse = mousePositionInWorld - transform.position;
+        if(directionFromPlayerToMouse.x > 0)
+        {
+            transform.localScale = new Vector3(2, 2, 2);
+        }
+        if (directionFromPlayerToMouse.x < 0)
+        {
+            transform.localScale = new Vector3(-2, 2, 2);
+        }
 
         float radiansToMouse = Mathf.Atan2(directionFromPlayerToMouse.y, directionFromPlayerToMouse.x);
         float angleToMouse = radiansToMouse * Mathf.Rad2Deg;
 
         aimPivot.rotation = Quaternion.Euler(0, 0, angleToMouse);
 
-        // Old Attack
+        //flip mouse on player looking other way
+        /*if (FacingLeft)
+        {
+            Flip();
+        }
+        else
+        if (!FacingLeft)
+        {
+            Flip();
+        }*/
+
+        // Sword Attack
         if (Input.GetKey(KeyCode.Alpha1))
+        {
+            weapon_equipped = 1;
+            ShowSword();
+        }
+       if (weapon_equipped == 1 && armswinging.instance.LaunchProjectile == true)
+        {
+            GameObject newProjectile = Instantiate(meleeblade);
+            newProjectile.transform.position = transform.position;
+            newProjectile.transform.rotation = aimPivot.rotation;
+        }
+
+        //Shadebringer
+        if (Input.GetKey(KeyCode.Alpha2) && unlockedShadebringer)
+        {
+            weapon_equipped = 2;
+            ShowShadebringer();
+        }
+        //Hellbourne
+        if (Input.GetKey(KeyCode.Alpha3) && unlockedHellbourne)
+        {
+            weapon_equipped = 3;
+            ShowHellbourne();
+        }
+        if (weapon_equipped == 3 && armswinging.instance.LaunchProjectile == true)
+        {
+            GameObject newProjectile = Instantiate(flames);
+            newProjectile.transform.position = transform.position;
+            GameObject newProjectile2 = Instantiate(flames);
+            newProjectile2.transform.position = transform.position;
+            GameObject newProjectile3 = Instantiate(flames);
+            newProjectile3.transform.position = transform.position;
+        }
+        /*if (Input.GetKey(KeyCode.Alpha1))
         {
             weapon_equipped = 0;
         }
@@ -268,10 +315,10 @@ public class Knight : Playerbase
                 i = 175;
             }
             newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
-        }
+        }*/
+        #endregion attacks
 
-
-        //freeze ability 
+        #region abilities
         //freeze ability 
         if (Input.GetKey(KeyCode.F) && spirit > 0)
         {
@@ -298,25 +345,43 @@ public class Knight : Playerbase
         }
 
         // Spirit dash ability
-        if (Input.GetKey(KeyCode.RightArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000)
+        if (Input.GetKey(KeyCode.RightArrow) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash || Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash)
         {
+            canDash = false;
             _rigidbody2D.AddForce(Vector2.right * 20f, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            StartCoroutine(dash());
         }
-        if (Input.GetKey(KeyCode.LeftArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000)
+        if (Input.GetKey(KeyCode.LeftArrow) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash)
         {
+            canDash = false;
             _rigidbody2D.AddForce(Vector2.left * 20f, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            StartCoroutine(dash());
         }
-        if (Input.GetKey(KeyCode.UpArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000)
+        if (Input.GetKey(KeyCode.UpArrow) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash || Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash)
         {
+            canDash = false;
             _rigidbody2D.AddForce(Vector2.up * 20f, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            StartCoroutine(dash());
         }
-        if (Input.GetKey(KeyCode.DownArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000)
+        if (Input.GetKey(KeyCode.DownArrow) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash || Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000 && canDash)
         {
+            canDash = false;
             _rigidbody2D.AddForce(Vector2.down * 20f, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            StartCoroutine(dash());
+        }
+
+        //consume
+        if (Input.GetKeyDown(KeyCode.Q) && canConsume && GameController.spirits > 1000)
+        {
+            health += 300;
+            GameController.spirits -= 1000;
+            canConsume = false;
+            HealthBar.fillAmount = health / maxHealth;
+            StartCoroutine(Consume());
         }
 
         // Regenerate spirit
@@ -324,13 +389,13 @@ public class Knight : Playerbase
         {
             spirit = 0;
         }
-        if (spirit <= 1000 && freezeflag != true)
+        if (spirit <= spiritMax && freezeflag != true)
         {
             spirit += 500f * Time.deltaTime;
         }
-        if (spirit > 1000)
+        if (spirit > spiritMax)
         {
-            spirit = 1000;
+            spirit = spiritMax;
         }
         Spiritbar.fillAmount = spirit / spiritMax;
 
@@ -343,6 +408,7 @@ public class Knight : Playerbase
         {
             iframes = 0;
         }
+        #endregion abilities
 
         // Inventory
         if (Input.GetKeyDown(KeyCode.Alpha0))
@@ -353,14 +419,11 @@ public class Knight : Playerbase
             }
         }
 
+#region transform
         // transforming
         if ((Input.GetKeyDown(KeyCode.G)))
         {
             Transformation();
-            Khealth.instance.toggle();
-            Shealth.instance.toggle();
-            SpiritK.instance.toggle();
-            SpiritS.instance.toggle();
         }
         // freeze movement
         if (animator.GetBool("activechar") == true)
@@ -371,6 +434,7 @@ public class Knight : Playerbase
         {
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
+        #endregion transform
 
         // damage indication 
         {
@@ -381,15 +445,6 @@ public class Knight : Playerbase
                     _spriteRenderer[i].color = Color.red;
                 }
             }
-            /*if (iframes > 0)
-            {
-                for (int i = 0; i < _spriteRenderer.Length; i++)
-                {
-                    Color lightred;
-                    lightred = new Color(255, 128, 129, 1);
-                    _spriteRenderer[i].color = lightred;
-                }
-            }*/
             else
             {
                 for (int i = 0; i < _spriteRenderer.Length; i++)
@@ -399,44 +454,15 @@ public class Knight : Playerbase
             }
         }
     }
+    public void heal()
+    {
+        health = maxHealth;
+    }
 
     private void FixedUpdate() // framerate locking rapid fire weapons
     {
-        /*if (Input.GetKey(KeyCode.Alpha3))
-        {
-            weapon_equipped = 2;
-        }
-        if (weapon_equipped == 2 && Input.GetMouseButton(0))
-        {
-
-            GameObject newProjectile = Instantiate(meleeblade);
-            newProjectile.transform.position = transform.position;
-            i += 5; // Rotation in degrees increment
-            if (i > 220)
-            {
-                i = 100;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
-            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - 180);
-        }
-        else if (Input.GetKey(KeyCode.Alpha4))
-        {
-            weapon_equipped = 3;
-        }
-        if (weapon_equipped == 3 && Input.GetMouseButton(0))
-        {
-
-            GameObject newProjectile = Instantiate(annihilationray);
-            newProjectile.transform.position = transform.position;
-            //newProjectile.transform.rotation = aimPivot.rotation;
-            i += 5; // Rotation in degrees increment
-            if (i > 200)
-            {
-                i = 180;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
-        }*/
-        if (Input.GetKey(KeyCode.Alpha6))
+        #region attacks2
+        /*if (Input.GetKey(KeyCode.Alpha6))
         {
             weapon_equipped = 5;
         }
@@ -444,13 +470,6 @@ public class Knight : Playerbase
         {
             GameObject newProjectile = Instantiate(Lightningprefab);
             newProjectile.transform.position = transform.position;
-            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
-            /*i += 25; // Rotation in degrees increment
-            if (i > 225)
-            {
-                i = 175;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
         }
         if (Input.GetKey(KeyCode.Alpha7))
         {
@@ -460,13 +479,6 @@ public class Knight : Playerbase
         {
             GameObject newProjectile = Instantiate(Cataclysmprefab);
             newProjectile.transform.position = transform.position;
-            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
-            /*i += 25; // Rotation in degrees increment
-            if (i > 225)
-            {
-                i = 175;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
         }
         if (Input.GetKey(KeyCode.Alpha8))
         {
@@ -476,21 +488,166 @@ public class Knight : Playerbase
         {
             GameObject newProjectile = Instantiate(Penumbraprefab);
             newProjectile.transform.position = transform.position;
-            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
-            /*i += 25; // Rotation in degrees increment
-            if (i > 225)
-            {
-                i = 175;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
         }
-    }
-    public void Transformation()
-    {
-        //GameController.instance.TransformationS();
-        animator.SetBool("activechar", true);
+        if (Input.GetKey(KeyCode.Alpha9))
+        {
+            weapon_equipped = 8;
+        }
+        if (weapon_equipped == 8 && Input.GetMouseButtonDown(0))
+        {
+            GameObject newProjectile = Instantiate(flames);
+            newProjectile.transform.position = transform.position;
+            GameObject newProjectile2 = Instantiate(flames);
+            newProjectile2.transform.position = transform.position;
+            GameObject newProjectile3 = Instantiate(flames);
+            newProjectile3.transform.position = transform.position;
+        }*/
+        #endregion attacks2
     }
 
+    #region weaponswaps
+    public GameObject sword, shadebringer, hellbourne;
+    public void Show()
+    {
+        // make it so that we go back to the greeting upon reopening
+        ShowSword();
+        sword.SetActive(true);
+        shadebringer.SetActive(false);
+        hellbourne.SetActive(false);
+    }
+    public void Hide()
+    {
+        gameObject.gameObject.SetActive(false);
+    }
+    void switchMenu(GameObject someMenu)
+    {
+        //clean up
+        sword.SetActive(false);
+        hellbourne.SetActive(false);
+        shadebringer.SetActive(false);
+
+        //activate requested menu
+        someMenu.SetActive(true);
+    }
+
+    public void ShowSword() // calling it like this prevents erroneously calling the wrong game object
+    {
+        switchMenu(sword);
+    }
+    public void ShowHellbourne()
+    {
+        switchMenu(hellbourne);
+    }
+    public void ShowShadebringer()
+    {
+        switchMenu(shadebringer);
+    }
+    #endregion weaponswaps
+
+    
+
+    public void Transformation()
+    {
+
+        if (GameController.instance.activeChar)
+        {
+            animator.SetBool("activechar", true);
+            Khealth.instance.off();
+            Shealth.instance.on();
+            SpiritK.instance.off();
+            SpiritS.instance.on();
+        }
+    }
+
+    IEnumerator dash()
+    {
+        yield return new WaitForSeconds(1);
+        canDash = true;
+    }
+
+    IEnumerator Consume()
+    {
+        yield return new WaitForSeconds(45);
+        canConsume = true;
+    }
+    IEnumerator flight()
+    {
+        flightcheck = false;
+        Audiocontroller.instance.playflight();
+        yield return new WaitForSeconds(0.35f);
+        flightcheck = true;
+    }
+    #region upgrades
+    public void Buyflight()
+    {
+        int cost = 100 + Mathf.RoundToInt((flight_new) * 2);
+        if (GameController.spirits >= cost)
+        {
+            GameController.spirits -= cost;
+
+            flight_new = flight_new + 100f;
+            Samurai.instance.flight_new = Samurai.instance.flight_new + 100f;
+            wingupgrade.text = "Spirit Essence: " + cost;
+        }
+    }
+
+    public void Buyhealth()
+    {
+        int cost = 100 + Mathf.RoundToInt(maxHealth);
+
+        if (GameController.spirits >= cost && health > 0)
+        {
+            GameController.spirits -= cost;
+
+            health += 50;
+            maxHealth += 50;
+            HealthBar.fillAmount = health / maxHealth;
+
+            Samurai.instance.boughthealth();
+
+
+            healthupgrade.text = "Spirit Essence: " + cost;
+        }
+    }
+
+    public void Buyspirit()
+    {
+        int cost = 100 + Mathf.RoundToInt(spiritMax);
+
+        if (GameController.spirits >= cost)
+        {
+            GameController.spirits -= cost;
+
+            spiritMax += 1000;
+            Spiritbar.fillAmount = spiritMax;
+
+            Samurai.instance.spiritMax += 1000;
+            Samurai.instance.SpiritbarS.fillAmount = Samurai.instance.spiritMax;
+
+            spiritupgrade.text = "Spirit Essence: " + cost;
+        }
+    }
+    public void BuyHellbourne()
+    {
+        int cost = 10000;
+
+        if (GameController.spirits >= cost && unlockedHellbourne != true)
+        {
+            GameController.spirits -= cost;
+            unlockedHellbourne = true;
+        }
+    }
+    public void BuyShadebringer()
+    {
+        int cost = 5000;
+
+        if (GameController.spirits >= cost && unlockedShadebringer != true)
+        {
+            GameController.spirits -= cost;
+            unlockedShadebringer = true;
+        }
+    }
+    #endregion upgrades
 
     // check player jumping to prevent air jumps
 
@@ -502,7 +659,7 @@ public class Knight : Playerbase
                 RaycastHit2D hit = hits[i];
                 if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground")){
                     jump_counter = 1;
-                    flight_time = 200f;
+                    flight_time = 200f + flight_new;
                 }
             }
         }

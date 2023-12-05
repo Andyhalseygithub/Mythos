@@ -12,28 +12,31 @@ using UnityEngine.UI;
 
 public class Samurai : Playerbase
 {
+    #region variables
     //get animator
     Animator animator;
     //Initialize playercontrol as an object for enemies to track
     public static Samurai instance;
     // initialize health and spirit vars
     public TMP_Text thealth;
-    public float health;
-    public float maxHealth;
+    public static float health;
+    public static float maxHealth;
     public TMP_Text tspirit;
     public float spirit;
     public float spiritMax;
     public UnityEngine.UI.Image SpiritbarS;
     public bool freezeflag;
     // inventory variables 
-    public float weapon_equipped = 1;
+    public float weapon_equipped = 0;
     // Initializing jumps and flighttime vars
     public int jump_counter;
     public float flight_time;
+    public float flight_new;
     // Initialize rigidbody for usage in code
     Rigidbody2D _rigidbody2D;
     //get transform and projectile code for player usage
     public Transform aimPivot;
+    public Transform aimPivot2;
     public GameObject testprojectilePrefab;
     public GameObject playershogunswordprefab;
     public GameObject meleeblade;
@@ -62,6 +65,21 @@ public class Samurai : Playerbase
 
     //menus
     public bool paused;
+
+    //upgrade texts
+    public TMP_Text healthupgrade;
+    public TMP_Text wingupgrade;
+    public TMP_Text spiritupgrade;
+    public bool unlockedPenumbra;
+    public bool unlockedBlizzard;
+
+    //dash 
+    public bool canDash;
+
+    //consume
+    public bool canConsume;
+
+    #endregion variables
     void Awake(){
         instance = this;
     }
@@ -72,10 +90,14 @@ public class Samurai : Playerbase
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _spriteRenderer = GetComponentsInChildren<SpriteRenderer>();
         animator = GetComponentInChildren<Animator>();
-        health = 100;
-        maxHealth = 100;
+        health = 300;
+        maxHealth = 300;
+        canDash = true;
+        canConsume = true;
         spirit = 1000;
         spiritMax = 1000;
+        unlockedPenumbra = false;
+        unlockedBlizzard = false;
     }
 
     // Update is called once per frame
@@ -89,46 +111,7 @@ public class Samurai : Playerbase
         {
             return; 
         }
-        //health
-        //thealth.text = health.ToString();
-
-        /*
-        // Set mass to 0.5 or lower for this, modify linear drag
-        if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S))
-        {
-            _rigidbody2D.AddForce(Vector2.down * 25f * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
-            if (_rigidbody2D.velocity.magnitude > maxSpeedY)
-            {
-                _rigidbody2D.velocity = _rigidbody2D.velocity.normalized * maxSpeedY;
-            }
-        }
-
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
-        {
-            _rigidbody2D.AddForce(Vector2.left * 15f * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
-            // sprite direction
-            if (_rigidbody2D.velocity.magnitude > maxSpeedX)
-            {
-                _rigidbody2D.velocity = _rigidbody2D.velocity.normalized * maxSpeedX;
-            }
-            // sprite direction
-            _spriteRenderer.flipX = true;
-
-        }
-
-        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
-        {
-            _rigidbody2D.AddForce(Vector2.right * 15f * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
-            // sprite direction
-            if (_rigidbody2D.velocity.magnitude > maxSpeedX)
-            {
-                _rigidbody2D.velocity = _rigidbody2D.velocity.normalized * maxSpeedX;
-            }
-            _spriteRenderer.flipX = false;
-        }*/
-
-        //if(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)){}
-
+        #region movement
         if (Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S)){
         _rigidbody2D.AddForce(Vector2.down * speedY * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
         }
@@ -137,7 +120,7 @@ public class Samurai : Playerbase
         _rigidbody2D.AddForce(Vector2.left * speedX * Time.deltaTime, ForceMode2D.Impulse); // vector(x,y,z)
 
             // sprite direction
-            transform.localScale = new Vector3(-2,2,2);
+            //transform.localScale = new Vector3(-2,2,2);
             //_spriteRenderer.flipX = true;
 
         }
@@ -145,7 +128,7 @@ public class Samurai : Playerbase
         if(Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)){
         _rigidbody2D.AddForce(Vector2.right * speedX * Time.deltaTime, ForceMode2D.Impulse);  // vector(x,y,z)
             // sprite direction
-            transform.localScale = new Vector3(2, 2, 2);
+            //transform.localScale = new Vector3(2, 2, 2);
             //_spriteRenderer.flipX = false;
         }
 
@@ -155,37 +138,63 @@ public class Samurai : Playerbase
         _rigidbody2D.AddForce(Vector2.up * 35f, ForceMode2D.Impulse); // vector(x,y,z)
         }
 
-        // Flight
-        /*
-        if(Input.GetKey(KeyCode.Space) && jump_counter == 0){
-            if(flight_time > 0){
-                flight_time--;
-                _rigidbody2D.AddForce(Vector2.up * .04f, ForceMode2D.Impulse);
-
-            }
-        }
-        */
-        //Application.targetFrameRate = 60; // Affects the rate of flight
         if(Input.GetKey(KeyCode.Space) && jump_counter == 0){
             if(flight_time > 0){
                 flight_time -= 100f * Time.deltaTime;
                 _rigidbody2D.AddForce(Vector2.up * 150f * Time.deltaTime, ForceMode2D.Impulse);
-
+                
             }
         }
+        #endregion movement
 
-        // Aim
+        #region attacks
+        // cursor
         Vector3 mousePosition = Input.mousePosition;
         Vector3 mousePositionInWorld = Camera.main.ScreenToWorldPoint(mousePosition);
         Vector3 directionFromPlayerToMouse = mousePositionInWorld - transform.position;
+        if (directionFromPlayerToMouse.x > 0)
+        {
+            transform.localScale = new Vector3(2, 2, 2);
+        }
+        if (directionFromPlayerToMouse.x < 0)
+        {
+            transform.localScale = new Vector3(-2, 2, 2);
+        }
 
         float radiansToMouse = Mathf.Atan2(directionFromPlayerToMouse.y, directionFromPlayerToMouse.x);
         float angleToMouse = radiansToMouse * Mathf.Rad2Deg;
 
         aimPivot.rotation = Quaternion.Euler(0, 0, angleToMouse);
 
-        // Old Attack
-        if (Input.GetKey(KeyCode.Alpha1)) 
+        // katana Attack
+        if (Input.GetKey(KeyCode.Alpha1))
+        {
+            weapon_equipped = 1;
+            ShowKatana();
+        }
+        if (weapon_equipped == 1 && Sarmswinging.instance.LaunchProjectile == true)
+        {
+            GameObject newProjectile = Instantiate(meleeblade);
+            newProjectile.transform.position = transform.position;
+            newProjectile.transform.rotation = aimPivot.rotation;
+        }
+
+        //penumbra
+        if (Input.GetKey(KeyCode.Alpha2) && unlockedPenumbra == true)
+        {
+            weapon_equipped = 2;
+            ShowPenumbra();
+        }
+
+        //blizzard attack
+        if (Input.GetKey(KeyCode.Alpha3) && unlockedBlizzard == true)
+        {
+            weapon_equipped = 3;
+            ShowBlizzard();
+        }
+
+
+        /*if (Input.GetKey(KeyCode.Alpha1)) 
         {
             weapon_equipped = 0;
         }
@@ -259,8 +268,10 @@ public class Samurai : Playerbase
                 i = 175;
             }
             newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
-        }
+        }*/
+        #endregion attacks
 
+        #region abilities
         //freeze ability 
         if (Input.GetKey(KeyCode.F) && spirit > 0){
             //_rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
@@ -286,35 +297,57 @@ public class Samurai : Playerbase
         }
 
         // Spirit dash ability
-        if(Input.GetKey(KeyCode.RightArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000){
+        if(Input.GetKey(KeyCode.RightArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit >= 1000 || Input.GetKey(KeyCode.D) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000){
         _rigidbody2D.AddForce(Vector2.right * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            canDash = false;
+            //animator.SetBool("dash", true);
+            StartCoroutine(dash());
         }
-        if(Input.GetKey(KeyCode.LeftArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000)
+        if(Input.GetKey(KeyCode.LeftArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit >= 1000 || Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000)
         {
         _rigidbody2D.AddForce(Vector2.left * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            canDash = false;
+            //animator.SetBool("dash", true);
+            StartCoroutine(dash());
         }
-        if(Input.GetKey(KeyCode.UpArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000){
+        if(Input.GetKey(KeyCode.UpArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit >= 1000 || Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000){
         _rigidbody2D.AddForce(Vector2.up * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            canDash = false;
+            //animator.SetBool("dash", true);
+            StartCoroutine(dash());
         }
-        if(Input.GetKey(KeyCode.DownArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit == 1000 || Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.LeftShift) && spirit == 1000){
+        if(Input.GetKey(KeyCode.DownArrow) && Input.GetKeyDown(KeyCode.LeftShift) && spirit >= 1000 || Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.LeftShift) && spirit >= 1000){
         _rigidbody2D.AddForce(Vector2.down * speedX, ForceMode2D.Impulse);  // vector(x,y,z)
             spirit -= 1000f;
+            canDash = false;
+            //animator.SetBool("dash", true);
+            StartCoroutine(dash());
+        }
+
+        if (Input.GetKeyDown(KeyCode.Q) && canConsume && GameController.spirits > 1000)
+        {
+            health += 300;
+            GameController.spirits -= 1000;
+            canConsume = false;
+            SHealthBar.fillAmount = health / maxHealth;
+            StartCoroutine(Consume());
         }
 
         // Regenerate spirit
-        if (spirit < 0 && freezeflag != true) {
+        if (spirit < 0 && freezeflag != true)
+        {
             spirit = 0;
         }
-        if (spirit <= 1000 && freezeflag != true)
+        if (spirit <= spiritMax && freezeflag != true)
         {
             spirit += 500f * Time.deltaTime;
         }
-        if (spirit > 1000)
+        if (spirit > spiritMax)
         {
-            spirit = 1000;
+            spirit = spiritMax;
         }
         SpiritbarS.fillAmount = spirit / spiritMax;
         // Increment Iframes
@@ -326,6 +359,7 @@ public class Samurai : Playerbase
         {
             iframes = 0;
         }
+        #endregion abilities
 
         // Inventory
         if (Input.GetKeyDown(KeyCode.Alpha0))
@@ -344,6 +378,7 @@ public class Samurai : Playerbase
             }
         }
 
+        #region transform
         // animation
         if ((Input.GetKeyDown(KeyCode.G)))
         {
@@ -359,7 +394,7 @@ public class Samurai : Playerbase
         {
             _rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
-
+        #endregion transform
         // damage indication 
         {
             if (iframes > 0)
@@ -378,43 +413,20 @@ public class Samurai : Playerbase
             }
         }
     }
+    public void heal()
+    {
+        health = maxHealth;
+    }
+
+    public void boughthealth()
+    {
+        health += 50;
+        maxHealth += 50;
+        SHealthBar.fillAmount = health / maxHealth;
+    }
     private void FixedUpdate() // framerate locking rapid fire weapons
     {
-        /*if (Input.GetKey(KeyCode.Alpha3))
-        {
-            weapon_equipped = 2;
-        }
-        if (weapon_equipped == 2 && Input.GetMouseButton(0))
-        {
-
-            GameObject newProjectile = Instantiate(meleeblade);
-            newProjectile.transform.position = transform.position;
-            i += 5; // Rotation in degrees increment
-            if (i > 220)
-            {
-                i = 100;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
-            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - 180);
-        }
-        else if (Input.GetKey(KeyCode.Alpha4))
-        {
-            weapon_equipped = 3;
-        }
-        if (weapon_equipped == 3 && Input.GetMouseButton(0))
-        {
-
-            GameObject newProjectile = Instantiate(annihilationray);
-            newProjectile.transform.position = transform.position;
-            //newProjectile.transform.rotation = aimPivot.rotation;
-            i += 5; // Rotation in degrees increment
-            if (i > 200)
-            {
-                i = 180;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);
-        }*/
-        if (Input.GetKey(KeyCode.Alpha6))
+        /*if (Input.GetKey(KeyCode.Alpha6))
         {
             weapon_equipped = 5;
         }
@@ -422,25 +434,137 @@ public class Samurai : Playerbase
         {
             GameObject newProjectile = Instantiate(TendrilPrefab);
             newProjectile.transform.position = transform.position;
-            //newProjectile.transform.rotation = Quaternion.Euler(0, 0, -angleToMouse);
-            /*i += 25; // Rotation in degrees increment
-            if (i > 225)
-            {
-                i = 175;
-            }
-            newProjectile.transform.rotation = Quaternion.Euler(0, 0, angleToMouse - i);*/
-        }
+        }*/
     }
     public void Transformation()
     {
-        //GameController.instance.TransformationS();
-        animator.SetBool("activechar", true);
-        Khealth.instance.toggle();
-        Shealth.instance.toggle();
-        SpiritK.instance.toggle();
-        SpiritS.instance.toggle();
+        if (GameController.instance.activeChar)
+        {
+            animator.SetBool("activechar", true);
+            Khealth.instance.on();
+            Shealth.instance.off();
+            SpiritK.instance.on();
+            SpiritS.instance.off();
+        }
     }
 
+    #region weaponswaps
+    public GameObject katana, blizzard, penumbra;
+    public void Show()
+    {
+        // make it so that we go back to the greeting upon reopening
+        ShowKatana();
+        katana.SetActive(true);
+        blizzard.SetActive(false);
+        penumbra.SetActive(false);
+    }
+    public void Hide()
+    {
+        gameObject.gameObject.SetActive(false);
+    }
+    void switchMenu(GameObject someMenu)
+    {
+        //clean up
+        katana.SetActive(false);
+        blizzard.SetActive(false);
+        penumbra.SetActive(false);
+
+        //activate requested menu
+        someMenu.SetActive(true);
+    }
+
+    public void ShowKatana() // calling it like this prevents erroneously calling the wrong game object
+    {
+        switchMenu(katana);
+    }
+    public void ShowBlizzard()
+    {
+        switchMenu(blizzard);
+    }
+    public void ShowPenumbra()
+    {
+        switchMenu(penumbra);
+    }
+    #endregion weaponswaps
+
+    IEnumerator dash()
+    {
+        yield return new WaitForSeconds(1);
+        canDash = true;
+    }
+
+    IEnumerator Consume()
+    {
+        yield return new WaitForSeconds(45);
+        canConsume = true;
+    }
+
+    
+    #region upgrades
+    /*public void Buyflight()
+    {
+        int cost = 100 + Mathf.RoundToInt((flight_new) * 2);
+        if (GameController.spirits >= cost)
+        {
+            GameController.spirits -= cost;
+
+            flight_new = flight_new + 100f;
+            wingupgrade.text = "Spirits: " + cost;
+        }
+    }
+
+    public void Buyhealth()
+    {
+        int cost = 100 + Mathf.RoundToInt(maxHealth);
+
+        if (GameController.spirits >= cost && health > 0)
+        {
+            GameController.spirits -= cost;
+
+            health += 50;
+            maxHealth += 50;
+            SHealthBar.fillAmount = health / maxHealth;
+
+            wingupgrade.text = "Spirits: " + cost;
+        }
+    }
+
+    public void Buyspirit()
+    {
+        int cost = 100 + Mathf.RoundToInt(spiritMax);
+
+        if (GameController.spirits >= cost)
+        {
+            GameController.spirits -= cost;
+
+            spiritMax += 1000;
+            SpiritbarS.fillAmount = spiritMax;
+
+            spiritupgrade.text = "Spirits: " + cost;
+        }
+    }*/
+
+    public void BuyPenumbra()
+    {
+        int cost = 5000;
+
+        if (GameController.spirits >= cost && unlockedPenumbra != true)
+        {
+            GameController.spirits -= cost;
+            unlockedPenumbra = true;
+        }
+    }
+    public void BuyBlizzard()
+    {
+        int cost = 10000;
+
+        if (GameController.spirits >= cost && unlockedBlizzard != true)
+        {
+            GameController.spirits -= cost;
+            unlockedBlizzard = true;
+        }
+    }
+    #endregion upgrades
 
     // check player jumping to prevent air jumps
 
@@ -452,7 +576,7 @@ public class Samurai : Playerbase
                 RaycastHit2D hit = hits[i];
                 if(hit.collider.gameObject.layer == LayerMask.NameToLayer("Ground")){
                     jump_counter = 1;
-                    flight_time = 200f;
+                    flight_time = 200f + flight_new;
                 }
             }
         }

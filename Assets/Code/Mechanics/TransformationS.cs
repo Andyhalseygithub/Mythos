@@ -7,6 +7,5 @@ public class TransformationS : MonoBehaviour
     public void TransformFinish()
     {
         GameController.instance.TransformationK();
-        Shealth.instance.toggle();
     }
 }

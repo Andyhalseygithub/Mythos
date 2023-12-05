@@ -18,6 +18,8 @@ public class Door : MonoBehaviour
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.gameObject.GetComponent<Playerbase>()) {
+            Samurai.instance.heal();
+            Knight.instance.heal();
             SceneManager.LoadScene("Pagoda");
         }
     }

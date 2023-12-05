@@ -14,16 +14,24 @@ public class Shealth : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void toggle()
+    /*public void toggle()
     {
         gameObject.SetActive(!gameObject.activeInHierarchy);
-        /*if (gameObject.activeSelf == true) {
+        *//*if (gameObject.activeSelf == true) {
             gameObject.SetActive(!gameObject.activeInHierarchy);
         }
         else if (gameObject.activeSelf == false)
         {
             gameObject.SetActive(gameObject.activeInHierarchy);
-        }*/
+        }*//*
 
+    }*/
+    public void on()
+    {
+        gameObject.SetActive(true);
+    }
+    public void off()
+    {
+        gameObject.SetActive(false);
     }
 }

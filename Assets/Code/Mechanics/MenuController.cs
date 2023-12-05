@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 public class MenuController : MonoBehaviour
 {
     public static MenuController instance;
     //outlets
-    public GameObject mainMenu, optionsMenu, levelMenu;
+    public GameObject mainMenu, optionsMenu, levelMenu, debugMenu;
+    public GameObject BossHealthBar, BossHealthBarBack;
     //public GameObject Activeplayer, Samurai, Knight;
 
     //methods
@@ -50,6 +52,7 @@ public class MenuController : MonoBehaviour
         mainMenu.SetActive(false);
         optionsMenu.SetActive(false);
         levelMenu.SetActive(false);
+        debugMenu.SetActive(false);
 
         //activate requested menu
         someMenu.SetActive(true);
@@ -67,8 +70,36 @@ public class MenuController : MonoBehaviour
     {
         switchMenu(levelMenu);
     }
+    public void ShowDebugMenu()
+    {
+        switchMenu(debugMenu);
+    }
     public void LoadLevel(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
+    }
+    public void ResetSpirits()
+    {
+        GameController.spirits = 0;
+    }
+    public void DebugSpirits()
+    {
+        GameController.spirits += 100000;
+    }
+    public void DebugSpawns()
+    {
+        GameController.instance.starDelay = 100000000;
+        GameController.instance.maxStarDelay = 100000000;
+        GameController.instance.minStarDelay = 100000000;
+    }
+    public void Showbosshealth()
+    {
+        BossHealthBar.SetActive(true);
+        BossHealthBarBack.SetActive(true);
+    }
+    public void disablebosshealth()
+    {
+        BossHealthBar.SetActive(false);
+        BossHealthBarBack.SetActive(false);
     }
 }

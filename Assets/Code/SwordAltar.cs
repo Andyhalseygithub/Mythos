@@ -17,8 +17,9 @@ public class SwordAltar : MonoBehaviour
     {
         if (other.gameObject.GetComponent<Playerbase>()) {
             if (SpawnedBoss == false) {
-                GameObject spawnboss = Instantiate(Shogun);
-                spawnboss.transform.position = transform.position + new Vector3(5f, 20f, 0);
+                Shogun.SetActive(true);
+                /*GameObject spawnboss = Instantiate(Shogun);
+                spawnboss.transform.position = transform.position + new Vector3(5f, 20f, 0);*/
                 SpawnedBoss = true;
             }
         }

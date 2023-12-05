@@ -14,8 +14,12 @@ public class SpiritS : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void toggle()
+    public void on()
     {
-        gameObject.SetActive(!gameObject.activeInHierarchy);
+        gameObject.SetActive(true);
+    }
+    public void off()
+    {
+        gameObject.SetActive(false);
     }
 }
